@@ -137,6 +137,7 @@ by linear_combination [h1] [1] {normalization_tactic := `[simp]}
 
 /-! ### Cases that have linear_combination skip normalization -/
 
+
 example (a b : ℝ) (ha : 2*a = 4) (hab : 2*b = a - b) :
   b = 2 / 3 :=
 begin
@@ -145,11 +146,11 @@ begin
 end
 
 example (x y : ℤ) (h1 : x = -3) (h2 : y = 10) :
-  2*x + 2 = -6 :=
+  2*x = -6 :=
 begin
   linear_combination [h1] [2] {normalize := ff},
   simp,
-  
+  norm_cast
 end
 
 
