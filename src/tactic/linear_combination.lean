@@ -1,5 +1,5 @@
 /-
-Authors: Abby Goldberg, Robert Lewis
+Authors: Abby Goldberg
 -/
 import algebra
 import data.real.basic
