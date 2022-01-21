@@ -135,6 +135,24 @@ example (x y : ℤ) (h1 : 3*x + 2*y = 10):
 by linear_combination [h1] [1] {normalization_tactic := `[simp]}
 
 
+/-! ### Cases that have linear_combination skip normalization -/
+
+example (a b : ℝ) (ha : 2*a = 4) (hab : 2*b = a - b) :
+  b = 2 / 3 :=
+begin
+  linear_combination [ha, hab] [1/6, 1/3] {normalize := ff},
+  linarith
+end
+
+example (x y : ℤ) (h1 : x = -3) (h2 : y = 10) :
+  2*x + 2 = -6 :=
+begin
+  linear_combination [h1] [2] {normalize := ff},
+  simp,
+  
+end
+
+
 /-! ### Cases that should fail -/
 
 -- This should fail because there are no hypotheses given

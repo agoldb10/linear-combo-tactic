@@ -79,10 +79,13 @@ end
 /-- 
 A configuration object for `linear_combination`. 
 
+`normalize` describes whether or not the normalization step should be used.
+
 `normalization_tactic` describes the tactic used for normalization when
-checking if the weighted sum is equivalent to the goal.
+checking if the weighted sum is equivalent to the goal (when `normalize` is tt).
 -/
-meta structure linear_combination_config : Type := 
+meta structure linear_combination_config : Type :=
+(normalize : bool := tt)
 (normalization_tactic : tactic unit := `[ring1])
 
 
@@ -294,14 +297,14 @@ do
 This tactic attempts to prove the goal by normalizing the target.
 
 * Input:
-  * `config` : a linear_combination_config, which determines the tactic used
+  * `config` : a linear_combination_config, which determines the tactic used -- CHANGE NAME AND COMMENT
       for normalization
 
 * Outout: tactic unit
 -/
 meta def prove_equal (config : linear_combination_config) : tactic unit :=
 do
-  config.normalization_tactic
+  if config.normalize then config.normalization_tactic else pure ()
 
 
 /-! ### Part 4: Completed Tactic -/
