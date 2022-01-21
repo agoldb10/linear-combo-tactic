@@ -294,15 +294,17 @@ do
 
 
 /--
-This tactic attempts to prove the goal by normalizing the target.
+This tactic attempts to prove the goal by normalizing the target if the
+`normalize` field of the given configuration is true.
 
 * Input:
-  * `config` : a linear_combination_config, which determines the tactic used -- CHANGE NAME AND COMMENT
-      for normalization
+  * `config` : a linear_combination_config, which determines the tactic used
+      for normalization if normalization is done
 
 * Outout: tactic unit
 -/
-meta def prove_equal (config : linear_combination_config) : tactic unit :=
+meta def prove_equal_if_desired (config : linear_combination_config) :
+  tactic unit :=
 do
   if config.normalize then config.normalization_tactic else pure ()
 
@@ -311,8 +313,11 @@ do
 
 
 /--
-This is a finishing tactic that attempts to prove the target by
-  creating and applying a linear combination of a list of equalities.
+This is a tactic that attempts to prove the target by creating and applying a
+  linear combination of a list of equalities.  (If the `normalize` field of the
+  configuration is set to ff, then the tactic will simply set the user up to 
+  prove their target using the linear combination instead of attempting to
+  finish the proof.)
 
 Note: The left and right sides of all the equations should have the same
   ring type, and the coefficients should also have this type.  This type must
@@ -336,7 +341,7 @@ do
   hsum_on_left ← move_to_left_side hsum,
   move_target_to_left_side,
   set_goal_to_hleft_eq_tleft hsum_on_left,
-  prove_equal config,
+  prove_equal_if_desired config,
   pure ()
 
 
@@ -345,11 +350,13 @@ setup_tactic_parser
 
 
 /--
-This is the interactive version of a finishing tactic that attempts to prove
-  the target by creating and applying a linear combination of a list of
+This is the interactive version of a tactic that attempts to prove the
+  target by creating and applying a linear combination of a list of
   equalities.  The tactic will create a linear combination by adding the
   equalities together from left to right, so the order of the input hypotheses
-  does matter.
+  does matter.  If the `normalize` field of the configuration is set to ff,
+  then the tactic will simply set the user up to prove their target using the
+  linear combination instead of attempting to finish the proof.
 
 Note: The left and right sides of all the equations should have the same
   type, and the coefficients should also have this type.  This type must
