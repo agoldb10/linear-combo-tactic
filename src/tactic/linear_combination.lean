@@ -1,76 +1,60 @@
 /-
+Copyright (c) 2022 Abby Goldberg. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Abby Goldberg
 -/
-import algebra
-import data.real.basic
+
+import tactic.ring
 
 /-!
+
 # linear_combination Tactic
 
 In this file, the `linear_combination` tactic is created.  This attempts to
-  prove the target by creating and applying a linear combination of a list of
-  equalities.  This file also includes a definition for
-  `linear_combination_config`.  A `linear_combination_config` object can be 
-  passed into the tactic, allowing the user to specify a normalization tactic.
+prove the target by creating and applying a linear combination of a list of
+equalities.  This file also includes a definition for
+`linear_combination_config`.  A `linear_combination_config` object can be 
+passed into the tactic, allowing the user to specify a normalization tactic.
 
 ## Implementation Notes
 
 This tactic works by creating a weighted sum of the given equations with the
-  given coefficients.  Then, it subtracts the right side of the weighted sum
-  from the left side so that the right side equals 0, and it does the same with
-  the target.  Afterwards, it sets the goal to be the equality between the
-  lefthand side of the new goal and the lefthand side of the new weighted sum.
-  Lastly, it uses a normalization tactic to see if the weighted sum is equal
-  to the target.
+given coefficients.  Then, it subtracts the right side of the weighted sum
+from the left side so that the right side equals 0, and it does the same with
+the target.  Afterwards, it sets the goal to be the equality between the
+lefthand side of the new goal and the lefthand side of the new weighted sum.
+Lastly, it uses a normalization tactic to see if the weighted sum is equal
+to the target.
 
 ## References
 
 * <https://leanprover.zulipchat.com/#narrow/stream/239415-metaprogramming-.2F.20tactics/topic/Linear.20algebra.20tactic/near/213928196>
+
 -/
-
-
-set_option pp.beta true
-set_option pp.generalized_field_notation false
 
 namespace linear_combination
 
-
-
 /-! ### Lemmas -/
-
 
 lemma left_mul_both_sides {α} [h : has_mul α] {x y : α} (z : α) (h1 : x = y) :
   z * x = z * y :=
-by apply congr_arg (has_mul.mul z) h1
-
+congr_arg (has_mul.mul z) h1
 
 lemma sum_two_equations {α} [h : has_add α] {x1 y1 x2 y2 : α} (h1 : x1 = y1)
   (h2: x2 = y2) : x1 + x2 = y1 + y2 :=
-by convert congr (congr_arg has_add.add h1) h2
-
+congr (congr_arg has_add.add h1) h2
 
 lemma left_minus_right {α} [h : add_group α] {x y : α} (h1 : x = y) :
   x - y = 0 :=
-by apply sub_eq_zero.mpr h1
-
+sub_eq_zero.mpr h1
 
 lemma all_on_left_equiv {α} [h : add_group α] (x y : α) :
   (x = y) = (x - y = 0) :=
-begin
-  simp,
-  apply iff.intro,
-  { apply left_minus_right },
-  { intro h0,
-    exact sub_eq_zero.mp h0 }
-end
-
+propext (⟨left_minus_right, sub_eq_zero.mp⟩)
 
 lemma replace_eq_expr {α} [h : has_zero α] {x y : α} (h1 : x = 0) (h2 : y = x) :
   y = 0 :=
-begin
-  rw h2,
-  apply h1
-end
+by rwa h2
 
 
 /-! ### Configuration -/
@@ -116,7 +100,6 @@ do
     "must fulfill the 'has_mul' condition in order to multiply the " ++
     "equalities by the given factors.")
 
-
 /--
 Given two hypotheses stating that a = b and c = d, this tactic returns an
   expr stating that a + c = b + d.
@@ -134,7 +117,6 @@ do
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'has_add' condition in order to add the " ++
     "equalities together.")
-
 
 /--
 Given that a = b and c = d, along with a coefficient, this tactic returns an
@@ -156,7 +138,6 @@ do
   hmul2 ← mul_equality_expr heq2 coeff_for_eq2,
   -- Add the first equation and the newly computed equation together
   sum_equalities heq1 hmul2
-
 
 /--
 This tactic builds on the given summed equation by multiplying each equation in
@@ -197,8 +178,6 @@ meta def make_sum_of_hyps_helper :
   do tactic.fail ("The length of the input list of equalities should be the " ++
     "same as the length of the input list of coefficients")
 
-
-
 /--
 Given a list of names referencing equalities and a list of pexprs representing
   coefficients, this tactic creates a weighted sum of the equalities, where each
@@ -213,8 +192,7 @@ Given a list of names referencing equalities and a list of pexprs representing
 -/
 meta def make_sum_of_hyps (heqs : list name) (coeffs : list pexpr) :
   tactic expr :=
-do
-  make_sum_of_hyps_helper none heqs coeffs
+make_sum_of_hyps_helper none heqs coeffs
 
 
 /-! ### Part 2: Simplifying -/
@@ -238,7 +216,6 @@ do
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'add_group' condition in order to match the linear " ++
     "combination to the target.")
-
 
 /--
 Moves all the terms in the target to the left side of the equals sign by
@@ -292,7 +269,6 @@ do
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'has_zero' condition.")
 
-
 /--
 This tactic attempts to prove the goal by normalizing the target if the
 `normalize` field of the given configuration is true.
@@ -305,9 +281,7 @@ This tactic attempts to prove the goal by normalizing the target if the
 -/
 meta def prove_equal_if_desired (config : linear_combination_config) :
   tactic unit :=
-do
-  if config.normalize then config.normalization_tactic else pure ()
-
+when config.normalize config.normalization_tactic
 
 /-! ### Part 4: Completed Tactic -/
 
@@ -341,16 +315,23 @@ do
   hsum_on_left ← move_to_left_side hsum,
   move_target_to_left_side,
   set_goal_to_hleft_eq_tleft hsum_on_left,
-  prove_equal_if_desired config,
-  pure ()
+  prove_equal_if_desired config
 
 
 section interactive_mode
 setup_tactic_parser
 
+meta def parse_name_pexpr_pair : lean.parser (name × pexpr) :=
+do 
+  tk "(",
+  id ← ident,
+  tk ",",
+  coeff ← parser.pexpr 0,
+  tk ")",
+  pure (id, coeff)
 
 /--
-This is the interactive version of a tactic that attempts to prove the
+`linear_combination` attempts to prove the
   target by creating and applying a linear combination of a list of
   equalities.  The tactic will create a linear combination by adding the
   equalities together from left to right, so the order of the input hypotheses
@@ -374,23 +355,23 @@ Note: The left and right sides of all the equations should have the same
 * Output: tactic unit
 
 Example Usage:
-  Given that h1 and h2 are equalities in the local context
+  Given that `h1` and `h2` are equalities in the local context,
   `linear_combination [h1, h2] [2, -3]`
-  will attempt to solve the goal by computing 2 * h1 + -3 * h2
+  will attempt to solve the goal by computing `2 * h1 + -3 * h2`
   and matching that to the goal.
 -/
 add_tactic_doc
 { name := "linear_combination",
   category := doc_category.tactic,
   decl_names := [`tactic.interactive.linear_combination],
-  tags := []
-}
+  tags := [] }
+
 meta def _root_.tactic.interactive.linear_combination
-  (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
+  -- (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
+  (input : parse parse_name_pexpr_pair*)
   (config : linear_combination_config := {}) : tactic unit :=
-do
-  linear_combination heqs coeffs config,
-  pure ()
+let (heqs, coeffs) := list.unzip input in
+linear_combination heqs coeffs config
 
 
 
