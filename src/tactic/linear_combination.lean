@@ -8,36 +8,32 @@ import algebra
 import data.real.basic
 
 /-!
+
 # linear_combination Tactic
 
 In this file, the `linear_combination` tactic is created.  This attempts to
-  prove the target by creating and applying a linear combination of a list of
-  equalities.  This file also includes a definition for
-  `linear_combination_config`.  A `linear_combination_config` object can be 
-  passed into the tactic, allowing the user to specify a normalization tactic.
+prove the target by creating and applying a linear combination of a list of
+equalities.  This file also includes a definition for
+`linear_combination_config`.  A `linear_combination_config` object can be 
+passed into the tactic, allowing the user to specify a normalization tactic.
 
 ## Implementation Notes
 
 This tactic works by creating a weighted sum of the given equations with the
-  given coefficients.  Then, it subtracts the right side of the weighted sum
-  from the left side so that the right side equals 0, and it does the same with
-  the target.  Afterwards, it sets the goal to be the equality between the
-  lefthand side of the new goal and the lefthand side of the new weighted sum.
-  Lastly, it uses a normalization tactic to see if the weighted sum is equal
-  to the target.
+given coefficients.  Then, it subtracts the right side of the weighted sum
+from the left side so that the right side equals 0, and it does the same with
+the target.  Afterwards, it sets the goal to be the equality between the
+lefthand side of the new goal and the lefthand side of the new weighted sum.
+Lastly, it uses a normalization tactic to see if the weighted sum is equal
+to the target.
 
 ## References
 
 * <https://leanprover.zulipchat.com/#narrow/stream/239415-metaprogramming-.2F.20tactics/topic/Linear.20algebra.20tactic/near/213928196>
+
 -/
 
-
-set_option pp.beta true
-set_option pp.generalized_field_notation false
-
 namespace linear_combination
-
-
 
 /-! ### Lemmas -/
 
