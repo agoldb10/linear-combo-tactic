@@ -1,6 +1,5 @@
 import tactic.linear_combination
-
-set_option trace.app_builder true
+import data.real.basic
 
 
 /-! ### Simple Cases with ℤ and two or less equations -/
@@ -159,29 +158,43 @@ end
 -- This should fail because there are no hypotheses given
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y = -2*y + 1 :=
-by linear_combination [] []
-
+begin 
+  success_if_fail {linear_combination [] []},
+  linear_combination [h1, h2] [1, -2]
+end 
 -- This should fail because h1 does not have a corresponding coefficient
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [h1] []
+begin
+  success_if_fail {linear_combination [h1] []},
+  linear_combination [h1] [1]
+end
 
 -- This should fail because h2 does not have a corresponding coefficient
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [h1, h2] [1]
+begin 
+  success_if_fail {linear_combination [h1, h2] [1]},
+  linear_combination [h1] [1]
+end 
 
 -- This should fail because the first coefficient does not have a corresponding
 --   equality
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [] [1]
+begin
+  success_if_fail {linear_combination [] [1]},
+  linear_combination [h1] [1]
+end
 
 -- This should fail because the second coefficient does not have a corresponding
 --   equality
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [h1] [1, 0]
+begin 
+  success_if_fail {linear_combination [h1] [1, 0]},
+  linear_combination [h1] [1]
+end
 
 -- This should fail because the second coefficient has a different type than
 --   the equations it is being combined with.  This was a design choice for the
@@ -189,7 +202,10 @@ by linear_combination [h1] [1, 0]
 --   this behavior.
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [h1, h2] [1, (0 : ℝ)]
+begin 
+  success_if_fail {linear_combination [h1, h2] [1, (0 : ℝ)]},
+  linear_combination [h1] [1]
+end
 
 -- This should fail because the second coefficient has a different type than
 --   the equations it is being combined with.  This was a design choice for the
@@ -197,18 +213,27 @@ by linear_combination [h1, h2] [1, (0 : ℝ)]
 --   this behavior.
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y + 2*x = 1 :=
-by linear_combination [h1, h2] [1, (0 : ℕ)]
+begin 
+  success_if_fail {linear_combination [h1, h2] [1, (0 : ℕ)]},
+  linear_combination [h1] [1]
+end
 
 -- This should fail because the coefficients are incorrect.  They should instead
 --   be -2 and 3, respectively.
 example (x y : ℤ) (h1 : 3*x + 2*y = 10) (h2 : 2*x + 5*y = 3) :
   11*y = -11 :=
-by linear_combination [h1, h2] [2, -3]
+begin 
+  success_if_fail {linear_combination [h1, h2] [2, -3]},
+  linear_combination [h1, h2] [-2, 3]
+end
 
 -- This fails because the linear_combination tactic requires the equations
 --   and coefficients to use a type that fulfills the add_group condition,
 --   and ℕ does not.
 example (a b : ℕ) (h1 : a = 3) :
   a = 3 :=
-by linear_combination [h1] [(1 : ℕ)]
+begin
+  success_if_fail {linear_combination [h1] [(1 : ℕ)]},
+  exact h1
+end
 
