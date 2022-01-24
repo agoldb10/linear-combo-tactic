@@ -323,7 +323,7 @@ setup_tactic_parser
 
 
 /--
-This is the interactive version of a tactic that attempts to prove the
+`linear_combination` attempts to prove the
   target by creating and applying a linear combination of a list of
   equalities.  The tactic will create a linear combination by adding the
   equalities together from left to right, so the order of the input hypotheses
@@ -347,17 +347,17 @@ Note: The left and right sides of all the equations should have the same
 * Output: tactic unit
 
 Example Usage:
-  Given that h1 and h2 are equalities in the local context
+  Given that `h1` and `h2` are equalities in the local context,
   `linear_combination [h1, h2] [2, -3]`
-  will attempt to solve the goal by computing 2 * h1 + -3 * h2
+  will attempt to solve the goal by computing `2 * h1 + -3 * h2`
   and matching that to the goal.
 -/
 add_tactic_doc
 { name := "linear_combination",
   category := doc_category.tactic,
   decl_names := [`tactic.interactive.linear_combination],
-  tags := []
-}
+  tags := [] }
+
 meta def _root_.tactic.interactive.linear_combination
   (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
   (config : linear_combination_config := {}) : tactic unit :=
