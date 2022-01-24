@@ -10,8 +10,8 @@ import tactic.ring
 
 # linear_combination Tactic
 
-In this file, the `linear_combination` tactic is created.  This attempts to
-prove the target by creating and applying a linear combination of a list of
+In this file, the `linear_combination` tactic is created.  This tactic attempts
+to prove the target by creating and applying a linear combination of a list of
 equalities.  This file also includes a definition for
 `linear_combination_config`.  A `linear_combination_config` object can be 
 passed into the tactic, allowing the user to specify a normalization tactic.
@@ -321,6 +321,14 @@ do
 section interactive_mode
 setup_tactic_parser
 
+/--
+A parser that matches a pair in parentheses, where the first item in the pair
+is an identifier and the second item in the pair is a pexpr.
+
+* Input: None
+
+* Output: a lean.parser (name × pexpr)
+-/
 meta def parse_name_pexpr_pair : lean.parser (name × pexpr) :=
 do 
   tk "(",
@@ -331,13 +339,13 @@ do
   pure (id, coeff)
 
 /--
-`linear_combination` attempts to prove the
-  target by creating and applying a linear combination of a list of
-  equalities.  The tactic will create a linear combination by adding the
-  equalities together from left to right, so the order of the input hypotheses
-  does matter.  If the `normalize` field of the configuration is set to ff,
-  then the tactic will simply set the user up to prove their target using the
-  linear combination instead of attempting to finish the proof.
+`linear_combination` attempts to prove the target by creating and applying a
+  linear combination of a list of equalities.  The tactic will create a linear
+  combination by adding the equalities together from left to right, so the order
+  of the input hypotheses does matter.  If the `normalize` field of the
+  configuration is set to ff, then the tactic will simply set the user up to
+  prove their target using the linear combination instead of attempting to
+  finish the proof.
 
 Note: The left and right sides of all the equations should have the same
   type, and the coefficients should also have this type.  This type must
@@ -348,6 +356,9 @@ Note: The left and right sides of all the equations should have the same
   * `heqs` : a list of identifiers, referring to equations in the local context
   * `coeffs` : a list of coefficients to be multiplied with the corresponding
       equations in the list of names
+
+  * `input` : a sequence of name and pexpr pairs, which represents the pairs
+      of hypotheses and their corresponding coefficients
   * `config` : a linear_combination_config, which determines the tactic used
       for normalization; by default, this value is the standard configuration
       for a linear_combination_config
@@ -356,7 +367,7 @@ Note: The left and right sides of all the equations should have the same
 
 Example Usage:
   Given that `h1` and `h2` are equalities in the local context,
-  `linear_combination [h1, h2] [2, -3]`
+  `linear_combination (h1, 2) (h2, -3)`
   will attempt to solve the goal by computing `2 * h1 + -3 * h2`
   and matching that to the goal.
 -/
@@ -367,7 +378,6 @@ add_tactic_doc
   tags := [] }
 
 meta def _root_.tactic.interactive.linear_combination
-  -- (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
   (input : parse parse_name_pexpr_pair*)
   (config : linear_combination_config := {}) : tactic unit :=
 let (heqs, coeffs) := list.unzip input in
