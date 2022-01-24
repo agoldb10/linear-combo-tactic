@@ -321,6 +321,14 @@ do
 section interactive_mode
 setup_tactic_parser
 
+meta def parse_name_pexpr_pair : lean.parser (name × pexpr) :=
+do 
+  tk "(",
+  id ← ident,
+  tk ",",
+  coeff ← parser.pexpr 0,
+  tk ")",
+  pure (id, coeff)
 
 /--
 `linear_combination` attempts to prove the
@@ -359,8 +367,10 @@ add_tactic_doc
   tags := [] }
 
 meta def _root_.tactic.interactive.linear_combination
-  (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
+  -- (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
+  (input : parse parse_name_pexpr_pair*)
   (config : linear_combination_config := {}) : tactic unit :=
+let (heqs, coeffs) := list.unzip input in
 linear_combination heqs coeffs config
 
 

@@ -6,15 +6,15 @@ import data.real.basic
 
 example (x y : ℤ) (h1 : 3*x + 2*y = 10):
   3*x + 2*y = 10 :=
-by linear_combination [h1] [1]
+by linear_combination (h1, 1)
 
 example (x y : ℤ) (h1 : x + 2 = -3) (h2 : y = 10) :
   2*x + 4 = -6 :=
-by linear_combination [h1] [2]
+by linear_combination (h1, 2)
 
 example (x y : ℤ) (h1 : x*y + 2*x = 1) (h2 : x = y) :
   x*y = -2*y + 1 :=
-by linear_combination [h1, h2] [1, -2]
+by linear_combination (h1, 1) (h2, -2) 
 
 example (x y : ℤ) (h1 : x + 2 = -3) (h2 : y = 10) :
   2*x + 4 - y = -16 :=
@@ -108,7 +108,7 @@ by linear_combination [h1, h2] [c, 1]
 
 example (x y : ℚ) (h1 : x + y = 3) (h2 : 3*x = 7) :
   x*x*y + y*x*y + 6*x = 3*x*y + 14 :=
-by linear_combination [h1, h2] [x*y, 2]
+by linear_combination (h1, x*y) (h2, 2) 
 
 example {α} [h : comm_ring α] {a b c d e f : α} (h1 : a*d = b*c) (h2 : c*f = e*d) :
   c * (a*f - b*e) = 0 :=
@@ -119,7 +119,7 @@ by linear_combination [h1, h2] [e, a]
 
 example (x y : ℚ) (h1 : 3*x + 2*y = 10) (h2 : 2*x + 5*y = 3) :
   -11*y + 1 = 11 + 1 :=
-by linear_combination [h1, h2] [2, -3] {normalization_tactic := `[ring]}
+by linear_combination (h1, 2) (h2, -3) {normalization_tactic := `[ring]}
 
 example (x y : ℚ) (h1 : 3*x + 2*y = 10) (h2 : 2*x + 5*y = 3) :
   -11*y + 1 = 11 + 1 :=
@@ -127,7 +127,7 @@ by linear_combination [h1, h2] [2, -3] {normalization_tactic := `[ring1]}
 
 example (a b : ℝ) (ha : 2*a = 4) (hab : 2*b = a - b) :
   b = 2 / 3 :=
-by linear_combination [ha, hab] [1/6, 1/3] {normalization_tactic := `[ring_nf]}
+by linear_combination (ha, 1/6) (hab, 1/3) {normalization_tactic := `[ring_nf]}
 
 example (x y : ℤ) (h1 : 3*x + 2*y = 10):
   3*x + 2*y = 10 :=
@@ -147,7 +147,7 @@ end
 example (x y : ℤ) (h1 : x = -3) (h2 : y = 10) :
   2*x = -6 :=
 begin
-  linear_combination [h1] [2] {normalize := ff},
+  linear_combination (h1, 2) {normalize := ff},
   simp,
   norm_cast
 end
