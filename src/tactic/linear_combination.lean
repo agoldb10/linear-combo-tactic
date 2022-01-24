@@ -37,21 +37,17 @@ namespace linear_combination
 
 /-! ### Lemmas -/
 
-
 lemma left_mul_both_sides {α} [h : has_mul α] {x y : α} (z : α) (h1 : x = y) :
   z * x = z * y :=
 by apply congr_arg (has_mul.mul z) h1
-
 
 lemma sum_two_equations {α} [h : has_add α] {x1 y1 x2 y2 : α} (h1 : x1 = y1)
   (h2: x2 = y2) : x1 + x2 = y1 + y2 :=
 by convert congr (congr_arg has_add.add h1) h2
 
-
 lemma left_minus_right {α} [h : add_group α] {x y : α} (h1 : x = y) :
   x - y = 0 :=
 by apply sub_eq_zero.mpr h1
-
 
 lemma all_on_left_equiv {α} [h : add_group α] (x y : α) :
   (x = y) = (x - y = 0) :=
@@ -62,7 +58,6 @@ begin
   { intro h0,
     exact sub_eq_zero.mp h0 }
 end
-
 
 lemma replace_eq_expr {α} [h : has_zero α] {x y : α} (h1 : x = 0) (h2 : y = x) :
   y = 0 :=
@@ -115,7 +110,6 @@ do
     "must fulfill the 'has_mul' condition in order to multiply the " ++
     "equalities by the given factors.")
 
-
 /--
 Given two hypotheses stating that a = b and c = d, this tactic returns an
   expr stating that a + c = b + d.
@@ -133,7 +127,6 @@ do
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'has_add' condition in order to add the " ++
     "equalities together.")
-
 
 /--
 Given that a = b and c = d, along with a coefficient, this tactic returns an
@@ -155,7 +148,6 @@ do
   hmul2 ← mul_equality_expr heq2 coeff_for_eq2,
   -- Add the first equation and the newly computed equation together
   sum_equalities heq1 hmul2
-
 
 /--
 This tactic builds on the given summed equation by multiplying each equation in
@@ -196,8 +188,6 @@ meta def make_sum_of_hyps_helper :
   do tactic.fail ("The length of the input list of equalities should be the " ++
     "same as the length of the input list of coefficients")
 
-
-
 /--
 Given a list of names referencing equalities and a list of pexprs representing
   coefficients, this tactic creates a weighted sum of the equalities, where each
@@ -237,7 +227,6 @@ do
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'add_group' condition in order to match the linear " ++
     "combination to the target.")
-
 
 /--
 Moves all the terms in the target to the left side of the equals sign by
@@ -290,7 +279,6 @@ do
     pure () }
   <|> tactic.fail ("The type of the left and right sides of each equality " ++
     "must fulfill the 'has_zero' condition.")
-
 
 /--
 This tactic attempts to prove the goal by normalizing the target if the
