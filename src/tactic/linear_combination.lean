@@ -39,32 +39,23 @@ namespace linear_combination
 
 lemma left_mul_both_sides {α} [h : has_mul α] {x y : α} (z : α) (h1 : x = y) :
   z * x = z * y :=
-by apply congr_arg (has_mul.mul z) h1
+congr_arg (has_mul.mul z) h1
 
 lemma sum_two_equations {α} [h : has_add α] {x1 y1 x2 y2 : α} (h1 : x1 = y1)
   (h2: x2 = y2) : x1 + x2 = y1 + y2 :=
-by convert congr (congr_arg has_add.add h1) h2
+congr (congr_arg has_add.add h1) h2
 
 lemma left_minus_right {α} [h : add_group α] {x y : α} (h1 : x = y) :
   x - y = 0 :=
-by apply sub_eq_zero.mpr h1
+sub_eq_zero.mpr h1
 
 lemma all_on_left_equiv {α} [h : add_group α] (x y : α) :
   (x = y) = (x - y = 0) :=
-begin
-  simp,
-  apply iff.intro,
-  { apply left_minus_right },
-  { intro h0,
-    exact sub_eq_zero.mp h0 }
-end
+propext (⟨left_minus_right, sub_eq_zero.mp⟩)
 
 lemma replace_eq_expr {α} [h : has_zero α] {x y : α} (h1 : x = 0) (h2 : y = x) :
   y = 0 :=
-begin
-  rw h2,
-  apply h1
-end
+by rwa h2
 
 
 /-! ### Configuration -/
