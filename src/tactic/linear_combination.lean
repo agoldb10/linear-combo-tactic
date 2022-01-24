@@ -192,8 +192,7 @@ Given a list of names referencing equalities and a list of pexprs representing
 -/
 meta def make_sum_of_hyps (heqs : list name) (coeffs : list pexpr) :
   tactic expr :=
-do
-  make_sum_of_hyps_helper none heqs coeffs
+make_sum_of_hyps_helper none heqs coeffs
 
 
 /-! ### Part 2: Simplifying -/
@@ -282,9 +281,7 @@ This tactic attempts to prove the goal by normalizing the target if the
 -/
 meta def prove_equal_if_desired (config : linear_combination_config) :
   tactic unit :=
-do
-  if config.normalize then config.normalization_tactic else pure ()
-
+when config.normalize config.normalization_tactic
 
 /-! ### Part 4: Completed Tactic -/
 
@@ -318,8 +315,7 @@ do
   hsum_on_left ← move_to_left_side hsum,
   move_target_to_left_side,
   set_goal_to_hleft_eq_tleft hsum_on_left,
-  prove_equal_if_desired config,
-  pure ()
+  prove_equal_if_desired config
 
 
 section interactive_mode
@@ -365,9 +361,7 @@ add_tactic_doc
 meta def _root_.tactic.interactive.linear_combination
   (heqs : parse (list_of ident)) (coeffs : parse pexpr_list) 
   (config : linear_combination_config := {}) : tactic unit :=
-do
-  linear_combination heqs coeffs config,
-  pure ()
+linear_combination heqs coeffs config
 
 
 
